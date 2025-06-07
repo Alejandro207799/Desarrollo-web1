@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - E-commerce</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            border-radius: 10px;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
+        .login-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .login-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+        .loading {
+            display: none;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        #loginSection.active {
+            display: flex !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Section -->
+    <div id="loginSection" class="login-container d-flex align-items-center justify-content-center active">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card login-card">
+                        <div class="card-body p-5">
+                            <div class="text-center mb-4">
+                                <i class="fas fa-shopping-cart fa-3x text-primary mb-3"></i>
+                                <h3 class="fw-bold">Iniciar Sesión</h3>
+                                <p class="text-muted">Accede a tu cuenta</p>
+                            </div>
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>Correo Electrónico
+                                    </label>
+                                    <input type="email" class="form-control" id="email" required>
+                                    <div class="invalid-feedback">
+                                        Por favor ingresa un correo válido
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-lock me-2"></i>Contraseña
+                                    </label>
+                                    <input type="password" class="form-control" id="password" required>
+                                    <div class="invalid-feedback">
+                                        La contraseña es requerida
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-2">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Ingresar
+                                </button>
+                            </form>
+                            <div class="text-center mt-3">
+                                <small class="text-muted">
+                                    
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="d-none">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                    <div class="position-sticky pt-3">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-shopping-cart fa-2x text-white mb-2"></i>
+                            <h5 class="text-white">E-Commerce</h5>
+                        </div>
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#" data-section="dashboard">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-section="users">
+                                    <i class="fas fa-users me-2"></i>Usuarios
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-section="products">
+                                    <i class="fas fa-box me-2"></i>Productos
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-section="carts">
+                                    <i class="fas fa-shopping-basket me-2"></i>Carritos
+                                </a>
+                            </li>
+                            <li class="nav-item mt-auto">
+                                <a class="nav-link" href="#" id="logoutBtn">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <!-- Main content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                    <!-- Dashboard Section -->
+                    <div id="dashboardSection" class="content-section active">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h1>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-4">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                                        <h5 class="card-title">Usuarios</h5>
+                                        <p class="card-text text-muted">Gestiona usuarios del sistema</p>
+                                        <button class="btn btn-primary" data-section="users">Ver Usuarios</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-box fa-3x text-success mb-3"></i>
+                                        <h5 class="card-title">Productos</h5>
+                                        <p class="card-text text-muted">Catálogo de productos</p>
+                                        <button class="btn btn-success" data-section="products">Ver Productos</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-shopping-basket fa-3x text-warning mb-3"></i>
+                                        <h5 class="card-title">Carritos</h5>
+                                        <p class="card-text text-muted">Carritos de compras</p>
+                                        <button class="btn btn-warning" data-section="carts">Ver Carritos</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Users Section -->
+                    <div id="usersSection" class="content-section">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2"><i class="fas fa-users me-2"></i>Usuarios</h1>
+                        </div>
+                        <div class="loading text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Teléfono</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Products Section -->
+                    <div id="productsSection" class="content-section">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2"><i class="fas fa-box me-2"></i>Productos</h1>
+                        </div>
+                        <div class="loading text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                        <div class="row" id="productsGrid">
+                        </div>
+                    </div>
+
+                    <!-- Carts Section -->
+                    <div id="cartsSection" class="content-section">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2"><i class="fas fa-shopping-basket me-2"></i>Carritos de Compras</h1>
+                        </div>
+                        <div class="loading text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                        <div class="row" id="cartsGrid">
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user me-2"></i>Detalle del Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="userModalBody">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-box me-2"></i>Detalle del Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="productModalBody">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Detail Modal -->
+    <div class="modal fade" id="cartModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-shopping-basket me-2"></i>Detalle del Carrito</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="cartModalBody">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        class EcommerceApp {
+            constructor() {
+                this.apiBase = 'https://dummyjson.com';
+                this.currentUser = null;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // Login form
+                document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
+                
+                // Navigation
+                document.querySelectorAll('[data-section]').forEach(link => {
+                    link.addEventListener('click', (e) => this.handleNavigation(e));
+                });
+
+                // Logout
+                document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+            }
+
+            async handleLogin(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value.trim();
+
+                // Clear previous errors
+                document.getElementById('email').classList.remove('is-invalid');
+                document.getElementById('password').classList.remove('is-invalid');
+
+                // Basic validation
+                if (!email) {
+                    this.showFieldError('email', 'El correo es requerido');
+                    return;
+                }
+
+                if (!password) {
+                    this.showFieldError('password', 'La contraseña es requerida');
+                    return;
+                }
+
+                // Show loading state
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Validando...';
+                submitBtn.disabled = true;
+
+                try {
+                    console.log('Intentando login con DummyJSON API...');
+                    
+                    // Convert email to username format for DummyJSON
+                    let username = email;
+                    if (email.includes('@')) {
+                        username = email.split('@')[0];
+                    }
+
+                    const response = await fetch(`${this.apiBase}/auth/login`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: username,
+                            password: password,
+                            expiresInMins: 30
+                        })
+                    });
+
+                    console.log('Response status:', response.status);
+
+                    if (response.ok) {
+                        const userData = await response.json();
+                        console.log('Login exitoso:', userData);
+                        this.currentUser = userData;
+                        this.showMainApp();
+                    } else {
+                        const errorData = await response.json();
+                        console.log('Error de login:', errorData);
+                        this.showFieldError('password', 'Credenciales incorrectas. Verifica usuario y contraseña.');
+                    }
+                } catch (error) {
+                    console.error('Error de conexión:', error);
+                    this.showFieldError('password', 'Error de conexión. Intenta nuevamente.');
+                } finally {
+                    // Restore button state
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            }
+
+            validateEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            }
+
+            showFieldError(fieldId, message) {
+                const field = document.getElementById(fieldId);
+                field.classList.add('is-invalid');
+                const feedback = field.nextElementSibling;
+                if (feedback) feedback.textContent = message;
+            }
+
+            showMainApp() {
+                console.log('Intentando mostrar la aplicación principal...');
+                
+                // Ocultar login
+                const loginSection = document.getElementById('loginSection');
+                loginSection.classList.remove('active');
+                loginSection.style.display = 'none';
+                
+                // Mostrar app principal
+                const mainApp = document.getElementById('mainApp');
+                mainApp.classList.remove('d-none');
+                mainApp.style.display = 'block';
+                
+                // Mostrar dashboard
+                this.showSection('dashboard');
+                
+                console.log('Aplicación principal mostrada');
+                console.log('Login display:', loginSection.style.display);
+                console.log('Main app display:', mainApp.style.display);
+            }
+
+            logout() {
+                this.currentUser = null;
+                document.getElementById('mainApp').classList.add('d-none');
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('loginSection').classList.add('active');
+                document.getElementById('loginSection').style.display = 'flex';
+                document.getElementById('loginForm').reset();
+                // Clear any validation errors
+                document.getElementById('email').classList.remove('is-invalid');
+                document.getElementById('password').classList.remove('is-invalid');
+            }
+
+            handleNavigation(e) {
+                e.preventDefault();
+                const section = e.target.closest('[data-section]').dataset.section;
+                this.showSection(section);
+            }
+
+            showSection(sectionName) {
+                // Update navigation
+                document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+
+                // Show section
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(`${sectionName}Section`).classList.add('active');
+
+                // Load data
+                if (sectionName === 'users') this.loadUsers();
+                if (sectionName === 'products') this.loadProducts();
+                if (sectionName === 'carts') this.loadCarts();
+            }
+
+            async loadUsers() {
+                const loading = document.querySelector('#usersSection .loading');
+                const tableBody = document.getElementById('usersTableBody');
+                
+                loading.style.display = 'block';
+                tableBody.innerHTML = '';
+
+                try {
+                    const response = await fetch(`${this.apiBase}/users`);
+                    const data = await response.json();
+                    
+                    tableBody.innerHTML = data.users.map(user => `
+                        <tr>
+                            <td>${user.id}</td>
+                            <td>${user.firstName} ${user.lastName}</td>
+                            <td>${user.email}</td>
+                            <td>${user.phone}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="app.showUserDetail(${user.id})">
+                                    <i class="fas fa-eye"></i> Ver
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } catch (error) {
+                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar usuarios</td></tr>';
+                } finally {
+                    loading.style.display = 'none';
+                }
+            }
+
+            async loadProducts() {
+                const loading = document.querySelector('#productsSection .loading');
+                const grid = document.getElementById('productsGrid');
+                
+                loading.style.display = 'block';
+                grid.innerHTML = '';
+
+                try {
+                    const response = await fetch(`${this.apiBase}/products`);
+                    const data = await response.json();
+                    
+                    grid.innerHTML = data.products.map(product => `
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <img src="${product.thumbnail}" class="card-img-top" alt="${product.title}" style="height: 200px; object-fit: cover;">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">${product.title}</h5>
+                                    <p class="card-text flex-grow-1">${product.description.substring(0, 100)}...</p>
+                                    <div class="mt-auto">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="h5 text-success">$${product.price}</span>
+                                            <span class="badge bg-primary">${product.category}</span>
+                                        </div>
+                                        <button class="btn btn-primary w-100" onclick="app.showProductDetail(${product.id})">
+                                            <i class="fas fa-eye me-2"></i>Ver Detalle
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    grid.innerHTML = '<div class="col-12 text-center text-danger">Error al cargar productos</div>';
+                } finally {
+                    loading.style.display = 'none';
+                }
+            }
+
+            async loadCarts() {
+                const loading = document.querySelector('#cartsSection .loading');
+                const grid = document.getElementById('cartsGrid');
+                
+                loading.style.display = 'block';
+                grid.innerHTML = '';
+
+                try {
+                    const response = await fetch(`${this.apiBase}/carts`);
+                    const data = await response.json();
+                    
+                    grid.innerHTML = data.carts.map(cart => `
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-shopping-basket me-2"></i>Carrito #${cart.id}
+                                    </h5>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-1"><strong>Usuario ID:</strong> ${cart.userId}</p>
+                                            <p class="mb-1"><strong>Productos:</strong> ${cart.products.length}</p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-1"><strong>Total:</strong> <span class="text-success">$${cart.total}</span></p>
+                                            <p class="mb-1"><strong>Descuento:</strong> $${cart.discountedTotal}</p>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary w-100 mt-2" onclick="app.showCartDetail(${cart.id})">
+                                        <i class="fas fa-eye me-2"></i>Ver Detalle
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    grid.innerHTML = '<div class="col-12 text-center text-danger">Error al cargar carritos</div>';
+                } finally {
+                    loading.style.display = 'none';
+                }
+            }
+
+            async showUserDetail(userId) {
+                try {
+                    const response = await fetch(`${this.apiBase}/users/${userId}`);
+                    const user = await response.json();
+                    
+                    document.getElementById('userModalBody').innerHTML = `
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <img src="${user.image}" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                                <h4>${user.firstName} ${user.lastName}</h4>
+                                <p class="text-muted">${user.email}</p>
+                            </div>
+                            <div class="col-md-8">
+                                <h5><i class="fas fa-info-circle me-2"></i>Información Personal</h5>
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <strong>Edad:</strong> ${user.age} años<br>
+                                        <strong>Género:</strong> ${user.gender}<br>
+                                        <strong>Teléfono:</strong> ${user.phone}
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Fecha Nac.:</strong> ${user.birthDate}<br>
+                                        <strong>Tipo Sangre:</strong> ${user.bloodGroup}<br>
+                                        <strong>Altura:</strong> ${user.height} cm
+                                    </div>
+                                </div>
+                                <h5><i class="fas fa-map-marker-alt me-2"></i>Dirección</h5>
+                                <p>${user.address.address}, ${user.address.city}, ${user.address.state} ${user.address.postalCode}</p>
+                                <h5><i class="fas fa-briefcase me-2"></i>Trabajo</h5>
+                                <p><strong>${user.company.title}</strong> en ${user.company.name}<br>
+                                <small>${user.company.department}</small></p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    new bootstrap.Modal(document.getElementById('userModal')).show();
+                } catch (error) {
+                    alert('Error al cargar el detalle del usuario');
+                }
+            }
+
+            async showProductDetail(productId) {
+                try {
+                    const response = await fetch(`${this.apiBase}/products/${productId}`);
+                    const product = await response.json();
+                    
+                    document.getElementById('productModalBody').innerHTML = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        ${product.images.map((img, index) => `
+                                            <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                                                <img src="${img}" class="d-block w-100 rounded" style="height: 300px; object-fit: cover;">
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon"></span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h3>${product.title}</h3>
+                                <p class="text-muted">${product.brand} | ${product.category}</p>
+                                <div class="mb-3">
+                                    <span class="h4 text-success">$${product.price}</span>
+                                    <span class="badge bg-warning text-dark ms-2">${product.discountPercentage}% OFF</span>
+                                </div>
+                                <div class="mb-3">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <span>${product.rating} (${product.stock} en stock)</span>
+                                </div>
+                                <p>${product.description}</p>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <strong>SKU:</strong> ${product.sku}<br>
+                                        <strong>Peso:</strong> ${product.weight}g
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Dimensiones:</strong><br>
+                                        ${product.dimensions.width} x ${product.dimensions.height} x ${product.dimensions.depth} cm
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    new bootstrap.Modal(document.getElementById('productModal')).show();
+                } catch (error) {
+                    alert('Error al cargar el detalle del producto');
+                }
+            }
+
+            async showCartDetail(cartId) {
+                try {
+                    const response = await fetch(`${this.apiBase}/carts/${cartId}`);
+                    const cart = await response.json();
+                    
+                    document.getElementById('cartModalBody').innerHTML = `
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-shopping-basket me-2"></i>Carrito #${cart.id}</h5>
+                                <p><strong>Usuario ID:</strong> ${cart.userId}</p>
+                                <p><strong>Total Productos:</strong> ${cart.totalProducts}</p>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <h4>Total: <span class="text-success">$${cart.total}</span></h4>
+                                <p>Total con descuento: <span class="text-primary">$${cart.discountedTotal}</span></p>
+                            </div>
+                        </div>
+                        <h5><i class="fas fa-list me-2"></i>Productos en el Carrito</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Precio</th>
+                                        <th>Cantidad</th>
+                                        <th>Descuento</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${cart.products.map(product => `
+                                        <tr>
+                                            <td>
+                                                <img src="${product.thumbnail}" alt="${product.title}" 
+                                                     style="width: 50px; height: 50px; object-fit: cover;" class="rounded me-2">
+                                                ${product.title}
+                                            </td>
+                                            <td>$${product.price}</td>
+                                            <td><span class="badge bg-primary">${product.quantity}</span></td>
+                                            <td>${product.discountPercentage}%</td>
+                                            <td class="text-success"><strong>$${product.total}</strong></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    
+                    new bootstrap.Modal(document.getElementById('cartModal')).show();
+                } catch (error) {
+                    alert('Error al cargar el detalle del carrito');
+                }
+            }
+        }
+
+        // Initialize app
+        const app = new EcommerceApp();
+    </script>
+</body>
+</html>
